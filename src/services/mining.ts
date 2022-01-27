@@ -194,6 +194,8 @@ export class Mining {
     }
 
     start() {
+        console.log('开始挖矿游戏');
+
         this.getInfo().then(() => {
             if (this.todayDiamond < this.todayLimitDiamond) {
                 this.playGame();
