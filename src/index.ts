@@ -1,3 +1,4 @@
+import { Mining } from './services/mining';
 import { randomSleep } from "./helper/timer";
 import checkIn from "./services/checkIn";
 import dipLuck from "./services/dipLuck";
@@ -20,3 +21,4 @@ autoJuejin()
 
 
 //挖矿
+new Mining().start()
