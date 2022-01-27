@@ -2,6 +2,7 @@ import { randomSleep } from './../helper/timer';
 import { COOKIE, firstData, TOKEN } from "../helper/config";
 import request from "../helper/request";
 import { getXGameId } from '../helper/shared';
+import { CommandRsp, GameInfo, OverRsp, StartRsp, UserInfo } from '../types';
 
 const getUser = () => {
     return request({
@@ -10,7 +11,7 @@ const getUser = () => {
         headers: {
             cookie: COOKIE,
         },
-    });
+    }) as Promise<UserInfo>;
 }
 
 
@@ -22,7 +23,7 @@ const start = (params: Record<string, any>, uid: number | string, time: number) 
         headers: {
             authorization: TOKEN,
         },
-    });
+    }) as Promise<StartRsp>;
 }
 
 const getGameInfo = (uid: number | string, time: number) => {
@@ -32,7 +33,7 @@ const getGameInfo = (uid: number | string, time: number) => {
         headers: {
             'authorization': TOKEN,
         },
-    });
+    }) as Promise<GameInfo>;
 }
 const over = (params: Record<string, any>, uid: number | string, time: number) => {
     return request({
@@ -42,7 +43,7 @@ const over = (params: Record<string, any>, uid: number | string, time: number) =
         headers: {
             authorization: TOKEN,
         },
-    });
+    }) as Promise<OverRsp>;
 }
 
 const freshMap = (params: Record<string, any>, uid: number | string, time: number) => {
@@ -75,7 +76,7 @@ const command = (params: Record<string, any>, uid: number | string, time: number
             "Content-Type": "application/json;charset=UTF-8",
             "x-tt-gameid": xGameId,
         },
-    });
+    }) as Promise<CommandRsp>;
 }
 /* 彩蛋 */
 const pico = (params: Record<string, any>, uid: number | string, time: number) => {
@@ -109,18 +110,19 @@ const record = (uid: number | string, time: number) => {
 
 export class Mining {
     uid = ''
-    gameId = ''
+    gameId: string | number = 0
     deep = 0
     todayDiamond = 0
     todayLimitDiamond = 0
-
+    counter = 1
     async getInfo() {
         const time = new Date().getTime();
         // 获取用户信息
         const userInfo = await getUser();
-        //@ts-ignore
         this.uid = userInfo.user_id;
-        const resInfo: any = await getGameInfo(this.uid, time);
+        // 获取游戏信息
+        const resInfo: GameInfo = await getGameInfo(this.uid, time);
+
         this.deep = resInfo.gameInfo ? resInfo.gameInfo.deep : 0;
         this.gameId = resInfo.gameInfo ? resInfo.gameInfo.gameId : 0;
         this.todayDiamond = resInfo.userInfo.todayDiamond || 0;
@@ -130,14 +132,16 @@ export class Mining {
 
     async playGame() {
         try {
+            
+            console.log(`开始第${this.counter}次挖矿`);
+
             // 开始
             const startTime = new Date().getTime();
             const startParams = {
                 roleId: 3,
             };
-            const startData: any = await start(startParams, this.uid, startTime);
+            const startData: StartRsp = await start(startParams, this.uid, startTime);
             await randomSleep();
-            console.log('startData', startData);
             this.gameId = startData.gameId;
             // 发起指令
             const commandTime = +new Date().getTime();
@@ -145,19 +149,22 @@ export class Mining {
                 command: firstData.command,
             };
             const xGameId = getXGameId(this.gameId);
-            const commandData: any = await command(commandParams, this.uid, commandTime, xGameId);
-            console.log('commandData', commandData);
+            const commandData = await command(commandParams, this.uid, commandTime, xGameId);
+
             this.deep = commandData.curPos.y || 0;
             await randomSleep();
-            console.log('commandData', commandData);
-            // 结束
+            // 结束游戏
             const overTime = +new Date().getTime();
             const overParams = {
                 isButton: 1,
             };
-            const overData: any = await over(overParams, this.uid, overTime);
+            const overData = await over(overParams, this.uid, overTime);
+            console.log(`结束第${this.counter}次挖矿`, {
+                todayDiamond: overData.todayDiamond,
+                todayLimitDiamond: overData.todayLimitDiamond
+            });
+            this.counter++
             await randomSleep();
-            console.log('overData', overData);
             this.deep = overData.deep;
             // 更换地图
             const mapTime = +new Date().getTime();
@@ -196,7 +203,6 @@ export class Mining {
 
     start() {
         console.log('开始挖矿游戏');
-
         this.getInfo().then(() => {
             if (this.todayDiamond < this.todayLimitDiamond) {
                 this.playGame();
@@ -205,7 +211,9 @@ export class Mining {
                     console.log('记录', JSON.stringify(res));
                 })
             }
+            // this.playGame();
         })
+
     }
 
 }
