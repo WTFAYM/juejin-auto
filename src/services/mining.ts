@@ -146,7 +146,8 @@ export class Mining {
             };
             const xGameId = getXGameId(this.gameId);
             const commandData: any = command(commandParams, this.uid, commandTime, xGameId);
-            this.deep = commandData.curPos.y;
+            console.log('commandData', commandData);
+            this.deep = commandData.curPos.y || 0;
             await randomSleep();
             console.log('commandData', commandData);
             // 结束
@@ -197,13 +198,14 @@ export class Mining {
         console.log('开始挖矿游戏');
 
         this.getInfo().then(() => {
-            if (this.todayDiamond < this.todayLimitDiamond) {
-                this.playGame();
-            } else {
-                record(this.uid, Date.now()).then(res => {
-                    console.log('记录', JSON.stringify(res));
-                })
-            }
+            // if (this.todayDiamond < this.todayLimitDiamond) {
+            //     this.playGame();
+            // } else {
+            //     record(this.uid, Date.now()).then(res => {
+            //         console.log('记录', JSON.stringify(res));
+            //     })
+            // }
+            this.playGame();
         })
     }
 
