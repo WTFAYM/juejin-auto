@@ -199,6 +199,10 @@ export class Mining {
         this.getInfo().then(() => {
             if (this.todayDiamond < this.todayLimitDiamond) {
                 this.playGame();
+            } else {
+                record(this.uid, Date.now()).then(res => {
+                    console.log('记录', { record });
+                })
             }
         })
     }
