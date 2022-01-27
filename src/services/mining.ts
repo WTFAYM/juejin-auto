@@ -201,7 +201,7 @@ export class Mining {
                 this.playGame();
             } else {
                 record(this.uid, Date.now()).then(res => {
-                    console.log('记录', { record });
+                    console.log('记录', { res });
                 })
             }
         })
