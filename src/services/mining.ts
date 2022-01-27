@@ -145,7 +145,7 @@ export class Mining {
                 command: firstData.command,
             };
             const xGameId = getXGameId(this.gameId);
-            const commandData: any = command(commandParams, this.uid, commandTime, xGameId);
+            const commandData: any = await command(commandParams, this.uid, commandTime, xGameId);
             console.log('commandData', commandData);
             this.deep = commandData.curPos.y || 0;
             await randomSleep();
