@@ -7,6 +7,7 @@ const timer_1 = require("./helper/timer");
 const checkIn_1 = __importDefault(require("./services/checkIn"));
 const dipLuck_1 = __importDefault(require("./services/dipLuck"));
 const freeDraw_1 = __importDefault(require("./services/freeDraw"));
+//掘金签到
 function autoJuejin() {
     //签到
     (0, checkIn_1.default)().then(() => {
@@ -17,3 +18,4 @@ function autoJuejin() {
     });
 }
 autoJuejin();
+//挖矿

@@ -8,7 +8,6 @@ function request(options) {
     return new Promise((resolve, reject) => {
         (0, axios_1.default)(merge(options)).then((res) => {
             let data = res.data || {};
-            // console.log(data);
             if (data.err_no === 0 || data.code === 0) {
                 resolve(data.data);
             }
