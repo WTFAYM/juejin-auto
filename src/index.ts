@@ -1,3 +1,4 @@
+import { TOKEN, COOKIE } from './helper/config';
 import { Mining } from './services/mining';
 import { randomSleep } from "./helper/timer";
 import checkIn from "./services/checkIn";
@@ -21,4 +22,4 @@ autoJuejin()
 
 
 //挖矿
-new Mining().start()
+if (TOKEN && COOKIE) new Mining().start()
